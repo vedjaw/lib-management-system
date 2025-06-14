@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Login</h2>
+<form method="POST">
+    {% csrf_token %}
+    
+    <label for="email">Email:</label><br>
+    <input type="email" name="email" required><br><br>
+    
+    <label for="password">Password:</label><br>
+    <input type="password" name="password" required><br><br>
+    
+    <label for="user_type">Login as:</label>
+    <select name="user_type" required>
+        <option value="student">Student</option>
+        <option value="prof">Prof</option>
+    </select>
+    <br><br>
+    
+    <button type="submit">Login</button>
+</form>
+
+<br>
+<form action="{% url 'create_prof_user' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Create Prof User</button>
+</form>
+
+<form action="{% url 'create_student_user' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Create Student User</button>
+</form>
+
+{% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock %}

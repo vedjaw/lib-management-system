@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ book.book_name }}</h2>
+<p><strong>Author:</strong> {{ book.book_author }}</p>
+<p><strong>Available Copies:</strong> {{ book.no_of_copies_available }}</p>
+
+{% if on_hold %}
+    <p>This book is currently on hold by another student.</p>
+{% endif %}
+
+{% if book.no_of_copies_available > 0 %}
+    <a href="{% url 'issue-book' book.book_id %}">Issue Book</a>
+{% else %}
+    <p>No copies available. <a href="{% url 'hold-book' book.book_id %}">Put on Hold</a></p>
+{% endif %}
+{% endblock %}

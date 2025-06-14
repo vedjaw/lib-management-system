@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Hold Queue for {{ book.book_name }}</h2>
+
+<ol>
+    {% for hold in holds %}
+        <li>{{ hold.student.user.username }} — {{ hold.timestamp }}</li>
+    {% endfor %}
+</ol>
+{% endblock %}

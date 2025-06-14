@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Welcome, {{ request.user.username }}</h2>
+
+<!-- Logout Button -->
+<form method="POST" action="{% url 'logout' %}" style="text-align: right;">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+
+<p>You have issued {{ issued_books.count }} out of 7 allowed books.</p>
+
+<hr>
+
+<!-- ✅ Issued Books Section -->
+<h3>Your Issued Books:</h3>
+<ul>
+    {% for issue in issued_books %}
+        <li>
+            {{ issue.book.book_name }} — Return by {{ issue.return_date }}
+            {% if issue.is_renewed %}
+                (Renewed)
+            {% else %}
+                <a href="{% url 'renew-book' issue.id %}">Renew</a>
+            {% endif %}
+            |
+            <a href="{% url 'return-book' issue.id %}">Return</a>
+        </li>
+    {% empty %}
+        <li>No books issued.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<!-- ✅ Books on Hold Section -->
+<h3>Your Held Books:</h3>
+<ul>
+    {% for hold in held_books %}
+        <li>
+            {{ hold.book.book_name }} by {{ hold.book.book_author }}
+            |
+            <a href="{% url 'unhold-book' hold.book.id %}">Unhold</a>
+        </li>
+    {% empty %}
+        <li>No books currently on hold.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<!-- ✅ Search -->
+<h3>Search Books:</h3>
+<form method="GET" action="{% url 'student-dashboard' %}">
+    <input type="text" name="q" placeholder="Enter book title or author" value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if query %}
+    <h4>Results for "{{ query }}":</h4>
+    <ul>
+        {% for book in matching_books %}
+            <li>
+                {{ book.book_name }} by {{ book.book_author }} ({{ book.no_of_copies_available }} copies left)
+
+                {% if book.id in issued_book_ids %}
+                    — Book already issued
+                {% elif book.id in held_book_ids %}
+                    — Book already on hold
+                {% elif book.no_of_copies_available > 0 %}
+                    <a href="{% url 'issue-book' book.id %}">Issue</a>
+                {% else %}
+                    <a href="{% url 'hold-book' book.id %}">Hold</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No matching books found.</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Prof Dashboard</h2>
+
+<!-- Logout Button -->
+<form method="POST" action="{% url 'logout' %}" style="text-align: right;">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+
+<hr>
+
+<!-- Search Form -->
+<form method="get" action="{% url 'prof-dashboard' %}">
+    <input type="text" name="q" placeholder="Search by username or email" value="{{ query|default:'' }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if students %}
+    <h3>Search Results</h3>
+    {% for student in students %}
+        <h4>{{ student.user.username }}</h4>
+
+        <!-- Currently Issued Books -->
+        <h5>Currently Issued Books</h5>
+        {% if student.current_issues %}
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>Book</th>
+                    <th>Due Date</th>
+                </tr>
+                {% for issue in student.current_issues %}
+                    <tr>
+                        <td>{{ issue.book.book_name }}</td>
+                        <td>{{ issue.return_date }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No books currently issued.</p>
+        {% endif %}
+
+        <!-- Returned Books -->
+        <h5>Returned Books</h5>
+        {% if student.returned_issues %}
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>Book</th>
+                    <th>Returned On</th>
+                </tr>
+                {% for issue in student.returned_issues %}
+                    <tr>
+                        <td>{{ issue.book.book_name }}</td>
+                        <td>{{ issue.returned_on|default:"(Date not stored)" }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No books returned yet.</p>
+        {% endif %}
+
+        <hr>
+    {% endfor %}
+{% elif query %}
+    <p>No student found with that username or email.</p>
+{% endif %}
+{% endblock %}
