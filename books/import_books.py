@@ -21,7 +21,7 @@ def import_books_from_csv(csv_path):
             )
             if created:
                 count += 1
-        print(f"✅ Imported {count} new books.")
+        print(f"Imported {count} new books.")
 
-# Run the import
+
 import_books_from_csv('books/books_500.csv')

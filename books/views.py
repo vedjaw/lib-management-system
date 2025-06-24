@@ -35,28 +35,28 @@ def issue_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     student = StudentProfile.objects.get(user=request.user)
 
-    # 1. Enforce max limit
+ 
     issued_count = BookIssue.objects.filter(student=student, is_returned=False).count()
     if issued_count >= 7:
         messages.error(request, "You have already issued 7 books.")
         return redirect('student-dashboard')
 
-    # 2. Enforce available copies check
+    
     if book.no_of_copies_available <= 0:
         messages.error(request, "No copies available.")
         return redirect('book-detail', book_id=book_id)
 
-    # 3. Hold queue enforcement: allow only the first student to issue if holds exist
+    
     hold_queue = BookHold.objects.filter(book=book).order_by('timestamp')
     if hold_queue.exists():
         if hold_queue.first().student != student:
             messages.error(request, "You're not first in the hold queue for this book.")
             return redirect('student-dashboard')
         else:
-            # Remove the student from hold queue once they issue
+            
             BookHold.objects.filter(book=book, student=student).delete()
 
-    # 4. Issue the book
+    
     BookIssue.objects.create(book=book, student=student)
     book.no_of_copies_available -= 1
     book.save()
@@ -85,37 +85,37 @@ def hold_book(request, book_id):
 
 from django.utils import timezone
 
-from django.utils import timezone  # make sure this is present
+from django.utils import timezone  
 
-def return_book(request, issue_id):
-    issue = get_object_or_404(BookIssue, id=issue_id, is_returned=False)
+# def return_book(request, issue_id):
+#     issue = get_object_or_404(BookIssue, id=issue_id, is_returned=False)
     
-    # ✅ Mark as returned and record date
-    issue.is_returned = True
-    issue.returned_on = timezone.now().date()
-    issue.save()
+    
+#     issue.is_returned = True
+#     issue.returned_on = timezone.now().date()
+#     issue.save()
 
-    # Update book count
-    book = issue.book
-    book.no_of_copies_available += 1
-    book.save()
+    
+#     book = issue.book
+#     book.no_of_copies_available += 1
+#     book.save()
 
-    # Check hold queue
-    hold = BookHold.objects.filter(book=book).order_by('timestamp').first()
-    if hold:
-        # Auto-issue to the first student in the queue
-        BookIssue.objects.create(
-            student=hold.student,
-            book=book,
-            issue_date=timezone.now().date(),
-            return_date=timezone.now().date() + timedelta(days=14)
-        )
-        book.no_of_copies_available -= 1
-        book.save()
-        hold.delete()
+   
+#     hold = BookHold.objects.filter(book=book).order_by('timestamp').first()
+#     if hold:
+        
+#         BookIssue.objects.create(
+#             student=hold.student,
+#             book=book,
+#             issue_date=timezone.now().date(),
+#             return_date=timezone.now().date() + timedelta(days=14)
+#         )
+#         book.no_of_copies_available -= 1
+#         book.save()
+#         hold.delete()
 
-    messages.success(request, f"{book.book_name} returned successfully.")
-    return redirect('student-dashboard')
+#     messages.success(request, f"{book.book_name} returned successfully.")
+#     return redirect('student-dashboard')
 
 
 # def return_book(request, issue_id):
@@ -156,3 +156,72 @@ def unhold_book(request, book_id):
     messages.success(request, "Your hold on the book has been removed.")
     return redirect('student-dashboard')
 
+
+from .models import Fine
+
+# def add_fine(request, student_id):
+#     student = get_object_or_404(StudentProfile, id=student_id)
+
+#     if request.method == 'POST':
+#         reason = request.POST.get('reason')
+#         amount = int(request.POST.get('amount'))
+#         Fine.objects.create(student=student, reason=reason, amount=amount)
+#         messages.success(request, "Fine levied successfully.")
+#         return redirect('prof-dashboard') 
+
+from urllib.parse import urlencode
+
+def add_fine(request, student_id):
+    student = get_object_or_404(StudentProfile, id=student_id)
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        amount = int(request.POST.get('amount'))
+        Fine.objects.create(student=student, reason=reason, amount=amount)
+        messages.success(request, "Fine levied successfully.")
+
+        # Redirect with search query so it stays on the same page
+        query = urlencode({'q': student.user.username})
+        return redirect(f'/prof/dashboard/?{query}')
+
+
+
+# def delete_fine(request, fine_id):
+#     fine = get_object_or_404(Fine, id=fine_id)
+#     fine.delete()
+#     messages.success(request, "Fine removed.")
+#     return redirect('prof-dashboard')
+
+
+from urllib.parse import urlencode
+
+def delete_fine(request, fine_id):
+    fine = get_object_or_404(Fine, id=fine_id)
+    student_username = fine.student.user.username
+    fine.delete()
+    messages.success(request, "Fine removed.")
+
+    # Redirect back to the same student
+    query = urlencode({'q': student_username})
+    return redirect(f'/prof/dashboard/?{query}')
+
+def request_return(request, issue_id):
+    issue = get_object_or_404(BookIssue, id=issue_id, student=request.user.studentprofile, is_returned=False)
+    issue.return_requested = True
+    issue.save()
+    messages.success(request, "Return request sent to professor.")
+    return redirect('student-dashboard')
+
+# books/views.py
+def approve_return(request, issue_id):
+    issue = get_object_or_404(BookIssue, id=issue_id, return_requested=True, is_returned=False)
+    issue.is_returned = True
+    issue.returned_on = timezone.now()
+    issue.return_requested = False
+    issue.save()
+
+    issue.book.no_of_copies_available += 1
+    issue.book.save()
+
+    messages.success(request, "Book return approved.")
+    return redirect(f'/prof/dashboard/?q={issue.student.user.username}')

@@ -22,24 +22,33 @@
     {% for student in students %}
         <h4>{{ student.user.username }}</h4>
 
-        <!-- Currently Issued Books -->
+                <!-- Currently Issued Books -->
         <h5>Currently Issued Books</h5>
         {% if student.current_issues %}
             <table border="1" cellpadding="10">
                 <tr>
                     <th>Book</th>
                     <th>Due Date</th>
+                    <th>Return Request</th>
                 </tr>
                 {% for issue in student.current_issues %}
                     <tr>
                         <td>{{ issue.book.book_name }}</td>
                         <td>{{ issue.return_date }}</td>
+                        <td>
+                            {% if issue.return_requested %}
+                                <a href="{% url 'approve-return' issue.id %}">Approve Return</a>
+                            {% else %}
+                                No request
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </table>
         {% else %}
             <p>No books currently issued.</p>
         {% endif %}
+
 
         <!-- Returned Books -->
         <h5>Returned Books</h5>
@@ -58,6 +67,42 @@
             </table>
         {% else %}
             <p>No books returned yet.</p>
+        {% endif %}
+
+        <!-- Fine Management -->
+        <h5>Levy Fine</h5>
+        <form method="POST" action="{% url 'add-fine' student.id %}?q={{ student.user.username }}">
+            {% csrf_token %}
+            <label>Reason:</label>
+            <select name="reason">
+                <option value="Late return">Late return (₹5/day)</option>
+                <option value="Damaged book">Damaged book (₹2000)</option>
+            </select>
+            <label>Amount:</label>
+            <input type="number" name="amount" required>
+            <button type="submit">Add Fine</button>
+        </form>
+
+        <h5>Fines</h5>
+        {% if student.fines %}
+            <table border="1" cellpadding="10">
+                <tr>
+                    <th>Reason</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+                {% for fine in student.fines %}
+                    <tr>
+                        <td>{{ fine.reason }}</td>
+                        <td>₹{{ fine.amount }}</td>
+                        <td>{{ fine.created_at|date:"Y-m-d" }}</td>
+                        <td><a href="{% url 'delete-fine' fine.id %}?q={{ student.user.username }}">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No fines levied.</p>
         {% endif %}
 
         <hr>

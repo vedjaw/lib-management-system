@@ -10,6 +10,7 @@ from .models import CustomUser, StudentProfile
 from books.models import BookIssue
 from books.models import Book
 from django.db.models import Q
+from django.db.models import Sum
 
 
 
@@ -40,6 +41,26 @@ def is_prof(user):
 #     }
 #     return render(request, 'accounts/prof_dashboard.html', context)
 
+# def prof_dashboard(request):
+#     query = request.GET.get('q')
+#     students = []
+
+#     if query:
+#         students = StudentProfile.objects.filter(
+#             Q(user__username__icontains=query) |
+#             Q(user__email__icontains=query)
+#         ).distinct()
+
+#         for student in students:
+#             student.current_issues = student.bookissue_set.filter(is_returned=False)
+#             student.returned_issues = student.bookissue_set.filter(is_returned=True)
+
+#     context = {
+#         'students': students,
+#         'query': query,
+#     }
+#     return render(request, 'accounts/prof_dashboard.html', context)
+
 def prof_dashboard(request):
     query = request.GET.get('q')
     students = []
@@ -53,6 +74,7 @@ def prof_dashboard(request):
         for student in students:
             student.current_issues = student.bookissue_set.filter(is_returned=False)
             student.returned_issues = student.bookissue_set.filter(is_returned=True)
+            student.fines = Fine.objects.filter(student=student)
 
     context = {
         'students': students,
@@ -80,8 +102,32 @@ def prof_dashboard(request):
 #         'matching_books': matching_books,
 #     })
 
-from books.models import BookHold  # Make sure this is imported
+from books.models import BookHold,Fine  # Make sure this is imported
 
+
+# @login_required
+# def student_dashboard(request):
+#     student = request.user.studentprofile
+
+#     issued_books = BookIssue.objects.filter(student=student, is_returned=False)
+#     issued_book_ids = issued_books.values_list('book_id', flat=True)
+
+#     held_books = BookHold.objects.filter(student=student)
+#     held_book_ids = held_books.values_list('book_id', flat=True)
+
+#     query = request.GET.get('q', '')
+#     matching_books = Book.objects.filter(
+#         Q(book_name__icontains=query) | Q(book_author__icontains=query)
+#     ) if query else []
+
+#     return render(request, 'accounts/student_dashboard.html', {
+#         'issued_books': issued_books,
+#         'issued_book_ids': issued_book_ids,
+#         'held_books': held_books,
+#         'held_book_ids': held_book_ids,
+#         'query': query,
+#         'matching_books': matching_books,
+#     })
 
 @login_required
 def student_dashboard(request):
@@ -93,6 +139,10 @@ def student_dashboard(request):
     held_books = BookHold.objects.filter(student=student)
     held_book_ids = held_books.values_list('book_id', flat=True)
 
+    # Fine logic
+    fines = Fine.objects.filter(student=student)
+    total_fine = fines.aggregate(Sum('amount'))['amount__sum'] or 0
+
     query = request.GET.get('q', '')
     matching_books = Book.objects.filter(
         Q(book_name__icontains=query) | Q(book_author__icontains=query)
@@ -103,6 +153,8 @@ def student_dashboard(request):
         'issued_book_ids': issued_book_ids,
         'held_books': held_books,
         'held_book_ids': held_book_ids,
+        'fines': fines,
+        'total_fine': total_fine,
         'query': query,
         'matching_books': matching_books,
     })

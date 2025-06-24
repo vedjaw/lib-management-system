@@ -4,17 +4,20 @@
 
 <h2>Welcome, {{ request.user.username }}</h2>
 
-<!-- Logout Button -->
-<form method="POST" action="{% url 'logout' %}" style="text-align: right;">
-    {% csrf_token %}
-    <button type="submit">Logout</button>
-</form>
+<!-- Account Actions -->
+<div style="text-align: right;">
+    <a href="{% url 'password_change' %}" style="margin-right: 10px;">Change Password</a>
+    <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+</div>
 
 <p>You have issued {{ issued_books.count }} out of 7 allowed books.</p>
 
 <hr>
 
-<!-- ✅ Issued Books Section -->
+<!-- Issued Books -->
 <h3>Your Issued Books:</h3>
 <ul>
     {% for issue in issued_books %}
@@ -26,7 +29,7 @@
                 <a href="{% url 'renew-book' issue.id %}">Renew</a>
             {% endif %}
             |
-            <a href="{% url 'return-book' issue.id %}">Return</a>
+            <a href="{% url 'request-return' issue.id %}">Request Return</a>
         </li>
     {% empty %}
         <li>No books issued.</li>
@@ -35,7 +38,7 @@
 
 <hr>
 
-<!-- ✅ Books on Hold Section -->
+<!-- Held Books -->
 <h3>Your Held Books:</h3>
 <ul>
     {% for hold in held_books %}
@@ -51,7 +54,22 @@
 
 <hr>
 
-<!-- ✅ Search -->
+<!-- Fines -->
+<h3>Your Fines:</h3>
+{% if fines %}
+    <ul>
+        {% for fine in fines %}
+            <li>{{ fine.reason }} — ₹{{ fine.amount }}</li>
+        {% endfor %}
+    </ul>
+    <strong>Total Fine: ₹{{ total_fine }}</strong>
+{% else %}
+    <p>No fines levied.</p>
+{% endif %}
+
+<hr>
+
+<!-- Search -->
 <h3>Search Books:</h3>
 <form method="GET" action="{% url 'student-dashboard' %}">
     <input type="text" name="q" placeholder="Enter book title or author" value="{{ query }}">

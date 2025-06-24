@@ -27,10 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://aac8-2401-4900-1d4a-770f-2014-edca-98f4-1c15.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://d3ed-114-143-61-234.ngrok-free.app']
 
 
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Application definition
 
 INSTALLED_APPS = [

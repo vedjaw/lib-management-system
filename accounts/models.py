@@ -9,3 +9,6 @@ class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     gmail = models.EmailField()
     max_books_allowed = models.IntegerField(default=7)
+    
+    def __str__(self):
+        return self.user.username  
