@@ -2,6 +2,33 @@
 
 {% block content %}
 <h2>Prof Dashboard</h2>
+<!-- Return Requests Section -->
+{% if pending_returns %}
+    <h4 style="margin-top: 40px;">Return Requests Pending Approval</h4>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Student</th>
+            <th>Book</th>
+            <th>Return Date</th>
+            <th>Action</th>
+        </tr>
+        {% for issue in pending_returns %}
+        <tr>
+            <td>{{ issue.student.user.username }}</td>
+            <td>{{ issue.book.book_name }}</td>
+            <td>{{ issue.return_date }}</td>
+            <td>
+                <form method="POST" action="{% url 'approve-return' issue.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Approve</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p style="color: grey;">No pending return requests.</p>
+{% endif %}
 
 <!-- Logout Button -->
 <form method="POST" action="{% url 'logout' %}" style="text-align: right;">

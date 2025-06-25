@@ -23,13 +23,15 @@
     {% for issue in issued_books %}
         <li>
             {{ issue.book.book_name }} — Return by {{ issue.return_date }}
-            {% if issue.is_renewed %}
-                (Renewed)
+            
+            {% if issue.return_requested %}
+                <span style="color: green;">Return Requested</span>
             {% else %}
-                <a href="{% url 'renew-book' issue.id %}">Renew</a>
+                {% if not issue.is_renewed %}
+                    <a href="{% url 'renew-book' issue.id %}">Renew</a> |
+                {% endif %}
+                <a href="{% url 'request-return' issue.id %}">Request Return</a>
             {% endif %}
-            |
-            <a href="{% url 'request-return' issue.id %}">Request Return</a>
         </li>
     {% empty %}
         <li>No books issued.</li>

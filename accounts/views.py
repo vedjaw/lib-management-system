@@ -61,6 +61,27 @@ def is_prof(user):
 #     }
 #     return render(request, 'accounts/prof_dashboard.html', context)
 
+# def prof_dashboard(request):
+#     query = request.GET.get('q')
+#     students = []
+
+#     if query:
+#         students = StudentProfile.objects.filter(
+#             Q(user__username__icontains=query) |
+#             Q(user__email__icontains=query)
+#         ).distinct()
+
+#         for student in students:
+#             student.current_issues = student.bookissue_set.filter(is_returned=False)
+#             student.returned_issues = student.bookissue_set.filter(is_returned=True)
+#             student.fines = Fine.objects.filter(student=student)
+
+#     context = {
+#         'students': students,
+#         'query': query,
+#     }
+#     return render(request, 'accounts/prof_dashboard.html', context)
+
 def prof_dashboard(request):
     query = request.GET.get('q')
     students = []
@@ -76,9 +97,13 @@ def prof_dashboard(request):
             student.returned_issues = student.bookissue_set.filter(is_returned=True)
             student.fines = Fine.objects.filter(student=student)
 
+
+    pending_returns = BookIssue.objects.filter(return_requested=True, is_returned=False)
+
     context = {
         'students': students,
         'query': query,
+        'pending_returns': pending_returns,  
     }
     return render(request, 'accounts/prof_dashboard.html', context)
 
