@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://d3ed-114-143-61-234.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://a67b-114-143-61-234.ngrok-free.app']
 
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

@@ -82,14 +82,37 @@ def is_prof(user):
 #     }
 #     return render(request, 'accounts/prof_dashboard.html', context)
 
+# def prof_dashboard(request):
+#     query = request.GET.get('q')
+#     students = []
+
+#     if query:
+#         students = StudentProfile.objects.filter(
+#             Q(user__username__icontains=query) |
+#             Q(user__email__icontains=query)
+#         ).distinct()
+
+#         for student in students:
+#             student.current_issues = student.bookissue_set.filter(is_returned=False)
+#             student.returned_issues = student.bookissue_set.filter(is_returned=True)
+#             student.fines = Fine.objects.filter(student=student)
+
+
+#     pending_returns = BookIssue.objects.filter(return_requested=True, is_returned=False)
+
+#     context = {
+#         'students': students,
+#         'query': query,
+#         'pending_returns': pending_returns,  
+#     }
+#     return render(request, 'accounts/prof_dashboard.html', context)
 def prof_dashboard(request):
     query = request.GET.get('q')
     students = []
 
     if query:
         students = StudentProfile.objects.filter(
-            Q(user__username__icontains=query) |
-            Q(user__email__icontains=query)
+            Q(user__username__icontains=query) | Q(user__email__icontains=query)
         ).distinct()
 
         for student in students:
@@ -97,13 +120,18 @@ def prof_dashboard(request):
             student.returned_issues = student.bookissue_set.filter(is_returned=True)
             student.fines = Fine.objects.filter(student=student)
 
-
     pending_returns = BookIssue.objects.filter(return_requested=True, is_returned=False)
+    all_students = StudentProfile.objects.all()
+    all_books = Book.objects.all()
+    all_issued_books = BookIssue.objects.filter(is_returned=False)
 
     context = {
         'students': students,
         'query': query,
-        'pending_returns': pending_returns,  
+        'pending_returns': pending_returns,
+        'all_students': all_students,
+        'all_books': all_books,
+        'all_issued_books': all_issued_books,
     }
     return render(request, 'accounts/prof_dashboard.html', context)
 
@@ -256,7 +284,7 @@ def create_student_user(request):
             user.is_student = True
             user.save()
 
-            # Only create profile if it doesn't exist
+            
             if not StudentProfile.objects.filter(user=user).exists():
                 StudentProfile.objects.create(user=user)
 

@@ -225,3 +225,22 @@ def approve_return(request, issue_id):
 
     messages.success(request, "Book return approved.")
     return redirect(f'/prof/dashboard/?q={issue.student.user.username}')
+
+
+from django.shortcuts import render
+from accounts.models import StudentProfile
+from .models import Book
+
+def view_student_users(request):
+    students = StudentProfile.objects.select_related('user').all()
+    return render(request, 'books/view_students.html', {'students': students})
+
+def view_books(request):
+    books = Book.objects.all()
+    return render(request, 'books/view_books.html', {'books': books})
+
+from .models import BookIssue
+
+def view_issued_books(request):
+    issued_books = BookIssue.objects.filter(is_returned=False).select_related('student', 'book', 'student__user')
+    return render(request, 'books/view_issued_books.html', {'issued_books': issued_books})

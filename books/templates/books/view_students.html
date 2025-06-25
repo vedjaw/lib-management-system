@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Student Users</h2>
+<ul>
+    {% for student in students %}
+        <li>{{ student.user.username }} — {{ student.user.email }}</li>
+    {% empty %}
+        <li>No student users found.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'prof-dashboard' %}">← Back to Dashboard</a>
+{% endblock %}

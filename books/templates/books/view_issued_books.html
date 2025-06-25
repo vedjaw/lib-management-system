@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Issued Books</h2>
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Student</th>
+        <th>Book</th>
+        <th>Due Date</th>
+    </tr>
+    {% for issue in issued_books %}
+    <tr>
+        <td>{{ issue.student.user.username }}</td>
+        <td>{{ issue.book.book_name }}</td>
+        <td>{{ issue.return_date }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No issued books.</td></tr>
+    {% endfor %}
+</table>
+<a href="{% url 'prof-dashboard' %}">← Back to Dashboard</a>
+{% endblock %}

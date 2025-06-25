@@ -2,6 +2,7 @@
 
 {% block content %}
 <h2>Prof Dashboard</h2>
+
 <!-- Return Requests Section -->
 {% if pending_returns %}
     <h4 style="margin-top: 40px;">Return Requests Pending Approval</h4>
@@ -38,6 +39,16 @@
 
 <hr>
 
+<!-- Quick Links -->
+<h4>View Details</h4>
+<ul>
+    <li><a href="{% url 'view-student-users' %}">View All Student Users</a></li>
+    <li><a href="{% url 'view-books' %}">View All Books</a></li>
+    <li><a href="{% url 'view-issued-books' %}">View All Issued Books</a></li>
+</ul>
+
+<hr>
+
 <!-- Search Form -->
 <form method="get" action="{% url 'prof-dashboard' %}">
     <input type="text" name="q" placeholder="Search by username or email" value="{{ query|default:'' }}">
@@ -49,7 +60,7 @@
     {% for student in students %}
         <h4>{{ student.user.username }}</h4>
 
-                <!-- Currently Issued Books -->
+        <!-- Currently Issued Books -->
         <h5>Currently Issued Books</h5>
         {% if student.current_issues %}
             <table border="1" cellpadding="10">
@@ -75,7 +86,6 @@
         {% else %}
             <p>No books currently issued.</p>
         {% endif %}
-
 
         <!-- Returned Books -->
         <h5>Returned Books</h5>
