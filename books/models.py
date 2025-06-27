@@ -38,3 +38,12 @@ class Fine(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} — ₹{self.amount} for {self.reason}"
+
+class BookReturnRequest(models.Model):
+    issue = models.OneToOneField(BookIssue, on_delete=models.CASCADE)
+    requested_on = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Return Request for {self.issue.book.book_name} by {self.issue.student.user.username}"
+

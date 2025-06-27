@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4kkij2r&rj8hirss%z*xqdd10+lmo%xhee+s7!5!ht3b=&3wcj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['192.168.1.65','127.0.0.1','localhost']
 
 CSRF_TRUSTED_ORIGINS = ['https://a67b-114-143-61-234.ngrok-free.app']
 
@@ -126,5 +126,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
-
+STATIC_ROOT = BASE_DIR 
 

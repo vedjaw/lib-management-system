@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Hold Queue for {{ book.book_name }}</h2>
-
-<ol>
-    {% for hold in holds %}
-        <li>{{ hold.student.user.username }} — {{ hold.timestamp }}</li>
-    {% endfor %}
-</ol>
+<div class="card shadow mb-4">
+  <div class="card-header bg-primary text-white">
+    <h2 class="mb-0">Hold Queue for {{ book.book_name }}</h2>
+  </div>
+  <div class="card-body">
+    <ol class="list-group list-group-numbered">
+      {% for hold in holds %}
+        <li class="list-group-item">{{ hold.student.user.username }} &mdash; {{ hold.timestamp }}</li>
+      {% endfor %}
+    </ol>
+    <a href="{% url 'view-books' %}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Back to Books</a>
+  </div>
+</div>
 {% endblock %}

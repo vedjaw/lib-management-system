@@ -84,6 +84,7 @@ def hold_book(request, book_id):
 
 
 from django.utils import timezone
+from .models import BookReturnRequest
 
 from django.utils import timezone  
 
@@ -207,8 +208,14 @@ def delete_fine(request, fine_id):
 
 def request_return(request, issue_id):
     issue = get_object_or_404(BookIssue, id=issue_id, student=request.user.studentprofile, is_returned=False)
+    
+    # Prevent duplicate return request
+    if not hasattr(issue, 'bookreturnrequest'):
+        BookReturnRequest.objects.create(issue=issue)
+
     issue.return_requested = True
     issue.save()
+    
     messages.success(request, "Return request sent to professor.")
     return redirect('student-dashboard')
 

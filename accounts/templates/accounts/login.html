@@ -1,43 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<h2>Login</h2>
-<form method="POST">
-    {% csrf_token %}
-    
-    <label for="email">Email:</label><br>
-    <input type="email" name="email" required><br><br>
-    
-    <label for="password">Password:</label><br>
-    <input type="password" name="password" required><br><br>
-    
-    <label for="user_type">Login as:</label>
-    <select name="user_type" required>
-        <option value="student">Student</option>
-        <option value="prof">Prof</option>
-    </select>
-    <br><br>
-    
-    <button type="submit">Login</button>
-</form>
-
-<br>
-<form action="{% url 'create_prof_user' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Create Prof User</button>
-</form>
-
-<form action="{% url 'create_student_user' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Create Student User</button>
-</form>
-
-{% if messages %}
-    <ul>
-    {% for message in messages %}
-        <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-{% endif %}
-
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow p-4" style="width: 100%; max-width: 400px;">
+    <h2 class="mb-4 text-center">Login</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="user_type" class="form-label">Login as:</label>
+        <select name="user_type" class="form-select" required>
+          <option value="student">Student</option>
+          <option value="prof">Prof</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+    <div class="d-flex justify-content-between mt-3">
+      <form action="{% url 'create_prof_user' %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Create Prof User</button>
+      </form>
+      <form action="{% url 'create_student_user' %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Create Student User</button>
+      </form>
+    </div>
+    {% if messages %}
+      <div class="mt-3">
+        {% for message in messages %}
+          <div class="alert alert-info">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

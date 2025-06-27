@@ -1,17 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>{{ book.book_name }}</h2>
-<p><strong>Author:</strong> {{ book.book_author }}</p>
-<p><strong>Available Copies:</strong> {{ book.no_of_copies_available }}</p>
-
-{% if on_hold %}
-    <p>This book is currently on hold by another student.</p>
-{% endif %}
-
-{% if book.no_of_copies_available > 0 %}
-    <a href="{% url 'issue-book' book.book_id %}">Issue Book</a>
-{% else %}
-    <p>No copies available. <a href="{% url 'hold-book' book.book_id %}">Put on Hold</a></p>
-{% endif %}
+<div class="card shadow mb-4">
+  <div class="card-header bg-primary text-white">
+    <h2 class="mb-0">{{ book.book_name }}</h2>
+  </div>
+  <div class="card-body">
+    <p><strong>Author:</strong> {{ book.book_author }}</p>
+    <p><strong>Available Copies:</strong> {{ book.no_of_copies_available }}</p>
+    {% if on_hold %}
+      <div class="alert alert-warning">This book is currently on hold by another student.</div>
+    {% endif %}
+    <div class="mt-3">
+      {% if book.no_of_copies_available > 0 %}
+        <a href="{% url 'issue-book' book.book_id %}" class="btn btn-success me-2">Issue Book</a>
+      {% else %}
+        <span class="text-danger">No copies available.</span>
+        <a href="{% url 'hold-book' book.book_id %}" class="btn btn-warning ms-2">Put on Hold</a>
+      {% endif %}
+      <a href="{% url 'view-books' %}" class="btn btn-secondary ms-2">Back to Books</a>
+    </div>
+  </div>
+</div>
 {% endblock %}

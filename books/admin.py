@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, BookIssue, BookHold, Fine
+from .models import Book, BookIssue, BookHold, Fine, BookReturnRequest
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -68,3 +68,8 @@ class BookIssueAdmin(admin.ModelAdmin):
         self.message_user(request, f"Reverted return for {updated} book(s).")
 
 
+@admin.register(BookReturnRequest)
+class BookReturnRequestAdmin(admin.ModelAdmin):
+    list_display = ('issue', 'requested_on', 'approved')
+    list_filter = ('approved',)
+    search_fields = ('issue__student__user__username', 'issue__book__book_name')

@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Student Users</h2>
-<ul>
-    {% for student in students %}
-        <li>{{ student.user.username }} — {{ student.user.email }}</li>
-    {% empty %}
-        <li>No student users found.</li>
-    {% endfor %}
-</ul>
-<a href="{% url 'prof-dashboard' %}">← Back to Dashboard</a>
+<div class="card shadow mb-4">
+  <div class="card-header bg-primary text-white">
+    <h2 class="mb-0">Student Users</h2>
+  </div>
+  <div class="card-body">
+    <ul class="list-group">
+      {% for student in students %}
+        <li class="list-group-item">{{ student.user.username }} &mdash; {{ student.user.email }}</li>
+      {% empty %}
+        <li class="list-group-item text-center">No student users found.</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'prof-dashboard' %}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+  </div>
+</div>
 {% endblock %}
