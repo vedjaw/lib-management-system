@@ -172,18 +172,46 @@ from .models import Fine
 
 from urllib.parse import urlencode
 
+from django.core.mail import send_mail
+from django.conf import settings
+from urllib.parse import urlencode
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import Fine, StudentProfile
+
 def add_fine(request, student_id):
     student = get_object_or_404(StudentProfile, id=student_id)
 
     if request.method == 'POST':
         reason = request.POST.get('reason')
         amount = int(request.POST.get('amount'))
+
+        # Create Fine object
         Fine.objects.create(student=student, reason=reason, amount=amount)
         messages.success(request, "Fine levied successfully.")
 
-        # Redirect with search query so it stays on the same page
+        # Prepare email
+        subject = "Library Fine Notification"
+        message = (
+            f"Dear {student.user.username},\n\n"
+            f"You have been fined ₹{amount} for the following reason:\n\n"
+            f"{reason}\n\n"
+            "Please settle this fine at the earliest.\n\n"
+            "Regards,\nLibrary Management System"
+        )
+        recipient = [student.user.email]
+        sender = request.user.email if request.user.email else settings.DEFAULT_FROM_EMAIL
+
+        # Send the email
+        try:
+            send_mail(subject, message, sender, recipient)
+        except Exception as e:
+            print("Email sending failed:", e)
+
+        # Redirect to the same search results
         query = urlencode({'q': student.user.username})
         return redirect(f'/prof/dashboard/?{query}')
+
 
 
 
